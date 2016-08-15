@@ -1,0 +1,504 @@
+---
+title: "MainChulwalarRMD - Chulwalar Exports MSDS6306402 - Case Study 10 "
+author: "Celia Taylor"
+date: "August 15, 2016"
+output:
+  html_document:
+    keep_md: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r setupgtools1,  include=FALSE, echo=FALSE}
+
+### Author: Celia Taylor
+
+## remove all items in environment
+## rm(list = ls())
+
+## load gdata and plyr package if not already
+require(gtools, warn.conflicts = FALSE, quietly = TRUE)
+```
+
+```{r setupgdata1,  include=FALSE, echo=FALSE}
+# Load gdata
+require(gdata, warn.conflicts = FALSE, quietly = TRUE)
+```
+
+```{r setupplyr1,  include=FALSE, echo=FALSE}
+#Load plyr
+require(plyr, warn.conflicts = FALSE, quietly = TRUE) 
+```
+
+```{r setupDirectoryVariables1,  include=FALSE, echo=FALSE}
+# Set up directory variables  Directory assignment below works.
+maind <- "/Users/Celia Taylor/Documents/GitHub/MSDS6306402CaseStudy10Chulwalar"
+#maind <- "./GitHub/MSDS6306402CaseStudy10Chulwalar"
+#setwd("./Dropbox/2016 Summer Courses/MSDS 6306/Unit 10/ChulwalarCase")
+
+datad <- paste(maind, "DATA", sep = "/")
+analysisd <- paste(maind, "ANALYSIS", sep = "/")
+
+setwd(datad)
+```
+
+```{r LoadAndCleanData1,  include=FALSE, echo=FALSE}
+#Run Load Data and Clean Data
+## Load Data
+
+setwd(datad)
+source("LoadData.R")
+
+## Clean Data
+source("CleanData.R")
+
+```
+
+#
+#
+#####The Prime Minister of Chulwalar needs to know what the export data tells us about the economy of Chulwalar.
+#####The Prime Minister needs to know what the best model for the Export Data is.
+#####The exports are the plants, Efak, Wuge, Blue Etel, and Red Etel.
+#     
+##### The exports are measured in 7 different ways:  
+#####     as Total Plan, Total Etel Plan, Year Plan 
+#####     and individually (Efak, Wuge, Blue Etel, and Red Etel). 
+#
+#####The two variables are As Is and Plan Data to test how exact the planning is.
+#####A table shows the correlation (a linear relationship between two variables) of AsIs to Plan Data.
+#####The results show a a very high planning accuracy.
+#####Following the table, there are 3 sets of 6 or 7 plots.
+#
+#####The first set of 6 plots show time series data decomposed and separated into trend, seasonality, and remainder (remaining coincidental) components from one another.
+#####A relatively uniform seasonality is displayed.
+#
+#####The second set of 6 plots highlights the AsIs time series trend data.  Especially noteworthy is that trend of the total exports is almost linear.  This is the plot with the black, almost straight, diagonal positive slope line.
+#
+#####The third set of 6 plots series export data show the monthly plots to see how the seasonality breaks down by month.
+#
+#####The next series of plots is to search for correlation with external indicators.
+
+The indicators are as follows:
+
+* Monthly Change in Export Price Index (CEPI)
+* Monthly Satisfaction Index (SI) government based data
+* Average monthly temperatures in Chulwalar
+* Monthly births in Chulwalar
+* Monthly Satisfaction Index (SI) external index 
+* Yearly Exports from Urbano
+* Yearly number of Globalisation Party members in Chulwalar
+* Monthly Average Export Price Index for Chulwalar
+* Monthly Producer Price Index (PPI) for Etel in Chulwalar
+* National Holidays
+* Chulwalar Index (Total value of all companies in Chulwalar)
+* Monthly Inflation rate in Chulwalar
+*	Proposed spending for National Holidays
+* Influence of National Holiday
+
+The indicators will be converted into individual  vectors and subsequently converted into time series. The correlation of the indicators will then be tested against the As Is exports for Chulwalar. 
+
+#####The next series of plots and tables is for forecasting methods.
+
+The forecasting methods are as follows:
+
+* Simple Exponential Smoothing - SES
+* Holt's Linear Trend Method
+* Holt's Method with Exponential Trend
+* Holt's Linear Trend Method Dampened
+* Holt's Method with Exponential Trend Dampened
+* Holt Winter's Additive Method - Seasonal
+* Holt Winter's Multiplicative Method - Seasonal
+
+#####Exponential Smoothing uses past values to calculate a forecast. The strength with which each value influences the forecast is weakened with help of a smoothing parameter. Thus we are dealing with a weighted average, whose values fade out the longer ago they were in the past.
+
+#####The Akaike’s Information Criterion(AIC/AICc) or the Bayesian Information Criterion (BIC) should be at minimum.
+
+#####Additional simple statistics are done for the mean model residuals and the standard deviation for the model residuals.  Both of these should also be at a minimum.
+####Remember the residuals are the observed minus predicted.  In theory, the residuals that are smaller would be a better fit.  Looking for the smallest values.
+
+
+
+```{r mainExportASIsPlan1,  include=FALSE, echo=FALSE}
+
+# This is the AsIs vs. Plan
+
+List_Correlation_AsIs_vs_Plan_Values <- c(cor(TotalAsIs, TotalPlan ), 
+                             cor(EfakAsIs , EfakPlan),
+                             cor(WugeAsIs, WugePlan),
+                             cor(TotalEtelAsIs, TotalEtelPlan),
+                             cor(BlueEtelAsIs , BlueEtelPlan),
+                             cor(RedEtelAsIs , RedEtelPlan),
+                             cor(YearAsIs, YearPlan))
+
+str(List_Correlation_AsIs_vs_Plan_Values)
+
+dfCorrAsIsPlan1 <- ldply (List_Correlation_AsIs_vs_Plan_Values, data.frame)
+str(dfCorrAsIsPlan1)
+
+List_Correlation_AsIs_vs_Plan_Labels <- c("TotalAsIs correlated to TotalPlan",
+                             "EfakAsIs correlated to EfakPlan",
+                             "WugeAsIs correlated to WugePlan",
+                             "TotalEtelAsIs correlated to TotalEtelPlan",
+                             "BlueEtelAsIs correlated to BlueEtelPlan",
+                             "RedEtelAsIs correlated to RedEtelPlan",
+                             "YearAsIs correlated to YearPlan")
+
+# Show the structure of the label string
+
+str(List_Correlation_AsIs_vs_Plan_Labels)
+
+
+dfCorrAsIsPlanAndLabels1 <- cbind(List_Correlation_AsIs_vs_Plan_Labels, List_Correlation_AsIs_vs_Plan_Values)
+str(dfCorrAsIsPlanAndLabels1)
+head(dfCorrAsIsPlanAndLabels1)
+
+
+```
+```{r mainExportASIsPlan2,  include=TRUE, echo=FALSE}
+
+kable(dfCorrAsIsPlanAndLabels1, caption = "Correlation of AsIs vs. Plan Data.  Values closest to 1 or -1 show the strongest correlation.  Any number between -1 and -0.8 or 0.8 and 1.0 shows very strong correlation.  The 0.96 for YearAsIs correlated to YearPlan is extremely strong and shows a very high planning accuracy." )
+
+```
+
+
+
+```{r Analyze1,  include=TRUE, echo=FALSE}
+#This is the Analyze Data start.
+setwd(analysisd)
+source("AnalyzeData.R")
+```
+
+
+```{r mainMakeExportStructure1,  include=FALSE, echo=FALSE}
+#WHAT IS THE BEST MODEL FOR THE EXPORT DATA?
+#HOW DO YOU DEFINE "BEST"?
+
+#Monthly Change in Export Price Index (CEPI)
+cor(EfakAsIs , CEPI)
+## [1] 0.9303543
+
+#Monthly Satisfaction Index (SI) external index
+cor(EfakAsIs , SIExtern)
+## [1] 0.8358147
+
+
+#Yearly exports from Urbano
+cor(EfakAsIs , UrbanoExports)
+## [1] 0.9163565
+
+#Yearly number of Globalisation Party members in Chulwalar
+cor(EfakAsIs , GlobalisationPartyMembers)
+## [1] 0.8963942
+
+#Monthly Average Export Price Index for Chulwalar
+cor(EfakAsIs , AEPI)
+## [1] 0.9056624
+
+#Correlation with external indicators
+# GENERATE A CORRECT DATAFRAME FOR THE SIGNIFICANT CORRELATIONs BETWEEN EXPORTS AND EXTERNAL INDICATORS.
+
+listCorrValues <- c(cor(EfakAsIs , CEPI), cor(EfakAsIs , SIExtern), cor(EfakAsIs , UrbanoExports),                    cor(EfakAsIs , GlobalisationPartyMembers), cor(EfakAsIs , AEPI))
+
+str(listCorrValues)
+dfCorrValues1 <- ldply (listCorrValues, data.frame)
+str(dfCorrValues1)
+
+listCorrLabels <- c("Monthly Change in Export Price Index (CEPI)", "Monthly Satisfaction Index (SI) external index", "Yearly exports from Urbano", "Yearly number of Globalisation Party members in Chulwalar", "Monthly Average Export Price Index for Chulwalar")
+
+str(listCorrLabels)
+Most_Statistically_Significant_Correlation_Export_To_External_Indicators <-listCorrLabels
+Export_External_Correlation_Values <- dfCorrValues1
+dfExportCorrelation1 <- cbind(Most_Statistically_Significant_Correlation_Export_To_External_Indicators, Export_External_Correlation_Values)
+str(dfExportCorrelation1)
+```
+
+
+#####WHAT IS THE BEST PLANNING MODEL FOR THE EXPORT DATA?
+
+#####The correlation data shows that the metrics for YearAsIs to YearPlan is the most statistically significant with a value of 0.96.  The other plan values are also statistically significant, but the Prime Minister should know that the first gauge on the economy for planning purposes is the metric YearAsIs to YearPlan.  The other plan values are supporting evidence.  The definition of "Best" is based on the closest value to 1.0.  If the YearAsIs had a value of .90 or .91 like four others, then I would base it on what value was most easily available or look at the collection of all the .90-.91 for answers. 
+
+#####WHAT IS THE BEST EXPORT TO EXTERNAL INDICATOR MODEL?
+
+##### The following table has the top five statistically significant correlations between exports and external indicators.
+#
+##### These were selected because their values are the ones that most closely approach 1.0.
+#
+```{r mainMakeExportStructure2,  include=TRUE, echo=FALSE}
+kable(dfExportCorrelation1, caption = "The top five most statistically significant correlations between exports and external indicators.")
+```
+
+#####The most statistically significant correlation data for export to external indicator is the Monthly Change in Export Price Index (CEPI) with a value of 0.93.  The next most statistically significant value is the Yearly Exports from Urbano with a value of 0.91.  The Prime Minister should know that that the other external indicators are supporting evidence.  The choice was made based on the closest value to 1.0. 
+
+```{r BarplotlistCorrValues1,  include=FALSE, echo=FALSE}
+#barplot(dfCorrValues1, beside = TRUE, col = c("lightblue", "mistyrose", "lightcyan", "lightgreen", "violet"), legend = rownames(dfCorrValues1), ylim = c(0, 1.000))
+
+barplot(listCorrValues, beside = TRUE, col = c("lightblue", "mistyrose", "lightcyan", "lightgreen", "violet"), ylim = c(0, 1.000))
+#legend("topright", c("SimpleExpSmooth","HoltLinear","HoltMult","HoltLinearDamp","HoltMultDamp","HWSeasAdd","HWSeasMult"), cex=1.0, bty="n", fill=colours)
+```
+
+#####WHICH FORECAST MODEL IS THE BEST? 
+#####When comparing the seven different models, the Holt Winters models that take into account the seasonal elements of these plant exports have the best fit.  The AIC, BIC, AICc values are the lowest.
+
+
+```{r mainGetModelStructure1,  include=FALSE, echo=FALSE}
+#GET THE STRUCTURES OF THE DIFFERENT MODELS
+## Simple expontential smoothing
+#str(Model_ses)
+## Holt's linear trend method additive
+#str(Model_holt_1)
+### Holt's exponential trend method
+#str(Model_holt_2)
+## Holt's linear trend method additive Dampened 
+#str(Model_holt_3)
+## Holt's trend method multiplicative Dampened 
+#str(Model_holt_4)
+##Holt Winters Additive
+#str(Model_hw_1)
+##Holt Winters Multiplicative
+#str(Model_hw_2)
+#Model_ses$model[2:4]
+
+```
+
+
+```{r mainTEST1NotWorking,  include=FALSE, echo=FALSE}
+#Try ICVALs - NOT  WORKING
+setwd(maind)
+setwd(analysisd)
+
+
+
+
+# This gets the values for the levels, the change in slopes, and the seasonal components
+#fit1$model$state[,1:3]
+# The fitted function gets the predicted value for Quarter 1, Quarter 2, Quarter 3, Quarter4
+fitted(Model_hw_1)
+fitted(Model_hw_2)
+# Gets the predicted mean for the predicted years out with by Quarter 1, Quarter 2, Quarter 3, Quarter4
+Model_hw_1$mean
+Model_hw_2$mean
+
+```
+
+
+
+```{r mainMeanModelResiduals1,  include=FALSE, echo=FALSE}
+#SIMPLE STATS MEAN MODEL RESIDUAL
+## Simple statistics on residuals.  Remember the residuals are the observed minus predicted.  In theory, the residuals that are smaller would be a better fit.  Looking for the smallest values.
+
+## Simple expontential smoothing residuals
+mean(Model_ses$residuals)
+## Holt's linear trend method additive residuals
+mean(Model_holt_1$residuals)
+### Holt's exponential trend method residuals
+mean(Model_holt_2$residuals)
+## Holt's linear trend method additive Dampened residuals
+mean(Model_holt_3$residuals)
+## Holt's trend method multiplicative Dampened residuals
+mean(Model_holt_4$residuals) 
+##Holt Winters Additive residuals
+mean(Model_hw_1$residuals)
+##Holt Winters Multiplicative residuals
+mean(Model_hw_2$residuals)
+
+#### Model Residuals
+MeanModelResiduals <- c(mean(Model_ses$residuals), mean(Model_holt_1$residuals), mean(Model_holt_2$residuals), mean(Model_holt_3$residuals), mean(Model_holt_4$residuals), mean(Model_hw_1$residuals), mean(Model_hw_2$residuals))
+
+
+str(MeanModelResiduals)
+
+MeanModelResiduals1 <- MeanModelResiduals
+
+
+#colnames(MeanModelResiduals1) <- c("SimpleExpSmooth","HoltLinear","HoltMult","HoltLinearDamp","HoltMultDamp","HWSeasAdd","HWSeasMult")
+
+MeanModelResiduals1
+```
+
+
+
+
+```{r mainSDModelResiduals1,  include=FALSE, echo=FALSE}
+
+#SIMPLE STATS STANDARD DEVIATION MODEL RESIDUAL
+
+#  Compare the standard deviation as well to compare variability.  Looking for the smallest values to find best fit.
+
+## Simple Exponental Smoothing
+sd(Model_ses$residuals)
+## Holt's linear trend method additive standard deviation
+sd(Model_holt_1$residuals)
+## Holt's exponential trend method standard deviation
+sd(Model_holt_2$residuals)
+## Holt's linear trend method additive Dampened standard deviation
+sd(Model_holt_3$residuals)
+## Holt's trend method multiplicative Dampened standard deviation
+sd(Model_holt_4$residuals) 
+##Holt Winters Additive standard deviation
+sd(Model_hw_1$residuals)
+##Holt Winters Multiplicative standard deviation
+sd(Model_hw_2$residuals)
+
+
+
+#### Standard Deviation of Model Residuals
+SDModelResiduals <- c(sd(Model_ses$residuals), sd(Model_holt_1$residuals), sd(Model_holt_2$residuals), sd(Model_holt_3$residuals), sd(Model_holt_4$residuals), sd(Model_hw_1$residuals), sd(Model_hw_2$residuals))
+
+
+str(SDModelResiduals)
+SDModelResiduals
+
+
+#colnames(SDModelResiduals) <- c("SimpleExpSmooth","HoltLinear","HoltMult","HoltLinearDamp","HoltMultDamp","HWSeasAdd","HWSeasMult")
+
+SDModelResiduals
+
+
+
+
+```
+
+
+
+```{r mainAIC_BIC_AICc1,  include=FALSE, echo=FALSE}
+#AIC, AICc, BIC
+# Look at AIC, AICc, and BIC to find out which one has smallest values
+Model_hw_1$model
+Model_hw_2$model
+#  Dr. McGee states in video, "The multiplicative model is a better fit for these data and should, in theory, give a better fit over time."
+# Be very careful to not expect this model to be a fit over a long range in time.  
+```
+
+
+
+```{r mainAIC_BIC_AICc_Dataframe1,  include=FALSE, echo=FALSE}
+# GENERATE A CORRECT AIC, BIC, AICc DATAFRAME FOR THE MODELS
+l2 <- list(list(Model_ses$model[2], Model_ses$model[3], Model_ses$model[4])
+      , list(Model_holt_1$model[2], Model_holt_1$model[3], Model_holt_1$model[4])
+      , list(Model_holt_2$model[2], Model_holt_2$model[3], Model_holt_2$model[4])
+      , list(Model_holt_3$model[2], Model_holt_3$model[3], Model_holt_3$model[4])                                         , list(Model_holt_4$model[2], Model_holt_4$model[3], Model_holt_4$model[4])
+      , list(Model_hw_1$model[2], Model_hw_1$model[3], Model_hw_1$model[4])
+      , list(Model_hw_2$model[2], Model_hw_2$model[3], Model_hw_2$model[4]) 
+      )
+
+df2 <- ldply (l2, data.frame)
+str(df2)
+
+
+```
+
+```{r mainAIC_BIC_AICc2,  include=FALSE, echo=FALSE}
+
+  #shareimprove this answer
+#df2$aic[1:7]
+#hist(df2$aic[1:7])
+
+
+#plot(df2$aic[1:7])
+
+#barplot(df2$aic[1:7], beside = TRUE, col = c("lightblue", "mistyrose", "lightcyan"), legend = rownames(df2), ylim = c(2100, 2500))
+
+
+#barplot(df2$aic, beside = TRUE, col = c("lightblue", "mistyrose", "lightcyan"), legend = rownames(df2), ylim = c(2100, 2500))
+#This is a different try
+#barplot(df2, beside = TRUE, col = c("lightblue", "mistyrose", "lightcyan"), legend = rownames(df2), ylim = c(0, 2500))
+
+
+```
+
+
+
+```{r mainTABLEAIC_BIC_AICc1,  include=FALSE, echo=FALSE}
+
+
+#PUT DATAFRAME IN TABLE
+
+#create a column for labelling
+Models1 <- c("SimpleExpSmooth","HoltLinear","HoltMult","HoltLinearDamp","HoltMultDamp","HWSeasAdd","HWSeasMult")
+
+
+df8 <- cbind(Models1, df2)
+str(df8)
+
+kable(df8, caption = "Example kable Table8 produces a correct table" )
+
+df9 <- cbind(df8, MeanModelResiduals )
+str(df9)
+
+kable(df9, caption = "Example kable Table9 produces a correct table" )
+
+
+df10 <- cbind(df9, SDModelResiduals )
+str(df9)
+```
+
+
+
+```{r mainAIC_BIC_AICcBARPLOT1,  include=TRUE, echo=FALSE}
+
+#PLOT AIC, BIC, AICc IN BARPLOT
+
+colours <- c("purple", "violet", "blue", "yellow", "green", "orange", "red")
+
+barplot(as.matrix(df2), main="AIC, BIC, AICC Values for Different Models", ylab = "Numbers", cex.lab = 1.0, cex.main = 1.5, beside=TRUE, col=colours, ylim = c(2100, 2400))
+
+legend("topright", c("SimpleExpSmooth","HoltLinear","HoltMult","HoltLinearDamp","HoltMultDamp","HWSeasAdd","HWSeasMult"), cex=1.0, bty="n", fill=colours)
+
+
+
+```
+
+```{r mainTABLEAIC_BIC_AICc1_MMR_SDModRes,  include=TRUE, echo=FALSE}
+kable(df10, caption = "All Forecasting Models with AIC, BIC, AICc, Mean Model Residuals, and Standard Deviation of the Model Residuals" )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#####The Holt Winters Additive model has the lowest AIC, BIC, and AICc values, but the Holt Winters Multiplicative model is very close. The Principle of Occam's Razor indicates that that the simplest models are the best would favor Holt Winters Additive model over Holt Winters Multiplicative model.  However, the Holt Winters Multiplicative model's very statistically significant values of the Mean Model Residuals of 5.3e-03 and Standard Deviation Model Residuals of 8.8e-02 would have me inform the Prime Minister that the Holt Winters Multiplicative model is the first choice.
+
+
+
+
+
+
+
+
+
+
+
+
